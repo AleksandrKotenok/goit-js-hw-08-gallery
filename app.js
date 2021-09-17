@@ -62,4 +62,42 @@ const galleryItems = [
       'https://cdn.pixabay.com/photo/2019/05/17/04/35/lighthouse-4208843_1280.jpg',
     description: 'Lighthouse Coast Sea',
   },
-];
+]
+const refs = {
+  gallery: document.querySelector(".js-gallery"),
+  lightBox: document.querySelector(".lightbox"),
+  originalImage: document.querySelector(".lightbox__image"),
+  closeLightBoxBtn: document.querySelector('[data-action="close-lightbox"]')
+}
+const { gallery, lightBox, originalImage, closeLightBoxBtn } = refs;
+//Создание и рендер разметки по массиву данных galleryItems из app.js и предоставленному шаблону.
+//Реализация делегирования на галерее ul.js-gallery и получение url большого изображения.
+const createCards = (card) => {
+  return `<li class = "gallery__item">
+            <a class="gallery__link" href = "${card.original}">
+              <img class="gallery__image" src = "${card.preview}" data-source = "${card.original}" alt = "${card.description}"/>
+            </a>
+          </li>`
+}
+const tableWithCards = galleryItems.map(createCards).join('')
+gallery.insertAdjacentHTML("beforeend", tableWithCards)
+//Открытие модального окна по клику на элементе галереи.
+//Подмена значения атрибута src элемента img.lightbox__image.
+gallery.addEventListener("click", increase)
+function increase (event) {
+  if (event.target.nodeName !== "IMG") 
+    return
+  event.preventDefault()
+  lightBox.classList.add("is-open")
+  originalImage.src = event.target.dataset.source
+  originalImage.alt = event.target.alt  
+}
+//Закрытие модального окна по клику на кнопку button[data-action="close-lightbox"].
+//Очистка значения атрибута src элемента img.lightbox__image. Это необходимо для того,
+// чтобы при следующем открытии модального окна, пока грузится изображение, мы не видели предыдущее.
+closeLightBoxBtn.addEventListener("click", closeOriginal)
+function closeOriginal () {
+  lightBox.classList.remove("is-open")
+  originalImage.src = ''
+  originalImage.alt = ''
+}
